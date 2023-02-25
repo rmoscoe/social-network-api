@@ -12,7 +12,6 @@
   "author": "Ryan Moscoe",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
     "mongoose": "^6.10.0"
   },
   "devDependencies": {
