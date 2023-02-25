@@ -1,5 +1,6 @@
 const connection = require("../config/connection");
-const { User, Thought } = require("../models");
+const { User } = require("../models/User");
+const { Thought } = require("../models/Thought");
 const { makeUser, makeThought } = require("./data");
 
 connection.on("error", (err) => err);
@@ -15,57 +16,53 @@ connection.once("open", async () => {
         users.push(user);
     }
 
-    users.forEach((user, idx, users) => {
-        for (let i = 0; i < Math.floor(Math.random() * 5); i++) {
-            do {
-                let friend = users[Math.floor(Math.random() * users.length)].username;
-            }
-            while (friend === user.username || user.friends.includes(friend));
-            user.friends.push(friend);
-        }
-    })
-
     const thoughts = [];
 
     for (let i = 0; i < 20; i++) {
-        const thought = makeThought();
+        const thought = makeThought(users);
         thoughts.push(thought);
     }
 
-    thoughts.forEach((thought) => {
-        thought.reactions.forEach((reaction) => {
-            reaction.username = users[Math.floor(Math.random() * users.length)]._id;
-        });
-        thought.username = users[Math.floor(Math.random() * users.length)].username;
-    });
-
-    for (let i = 0; i < users.length; i++) {
-        for (let j = 0; j < thoughts.length; j++) {
-            if (thoughts[j].username === users[i].username) {
-                users[i].thoughts.push(thoughts[j]._id);
-            }
-        }
-    }
-
-    thoughts.forEach((thought) => {
-        const person = thought.username;
-        thought.username = person._id;
-    });
-
     await User.collection.insertMany(users);
 
-    await Post.collection.insertMany(posts);
+    await Thought.collection.insertMany(thoughts);
 
-    const finalUsers = await User.find().populate("friends").populate("thoughts");
+    let seededUsers = await User.find();
 
-    const finalThoughts = await Thought.find().populate("username").populate({
-        path: "reactions",
-        populate: [
-            {path: "username", model: "User"}
-        ]
+    for (let i = 0; i < 18; i++) {
+        const friend1 = seededUsers[Math.floor(Math.random() * seededUsers.length)];
+        let friend2 = seededUsers[Math.floor(Math.random() * seededUsers.length)];
+
+        while (friend1 === friend2) {
+            friend2 = seededUsers[Math.floor(Math.random() * seededUsers.length)];
+        }
+        
+        await User.findOneAndUpdate({ "_id": friend1._id }, { $push: { friends: friend2._id } }, { new: true });
+
+        await User.findOneAndUpdate({ "_id": friend2._id }, { $push: { friends: friend1._id } }, { new: true });
+    }
+
+    const seededThoughts = await Thought.find();
+
+    seededThoughts.forEach(async (thought) => {
+        // Get the username and add the thought id to the user's thoughts.
+        for (let i = 0; i < seededUsers.length; i++) {
+            if (seededUsers[i].username === thought.username) {
+                await User.findOneAndUpdate({"_id": seededUsers[i]._id}, {$push: {thoughts: thought._id}}, {new: true});
+                break;
+            }
+        }
     });
+
+    seededUsers = await User.find();
     
-    console.table(finalUsers);
-    console.table(finalThoughts);
+    // const objUsers = seededUsers.map((user) => {return user.toObject({virtuals: true})});
+    // const objThoughts = seededThoughts.map((thought) => {return thought.toObject({virtuals: true})});
+
+    // console.log(objUsers);
+    // console.log(objThoughts);
+
+    console.log(seededUsers.toString());
+    console.log(seededThoughts.toString());
     process.exit(0);
 });

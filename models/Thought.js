@@ -1,7 +1,7 @@
-const { Schema, Model } = require("mongoose");
+const mongoose = require("mongoose");
 
 // Schema to create Thought model
-const thoughtSchema = new Schema(
+const thoughtSchema = new mongoose.Schema(
     {
         thoughtText: {
             type: String,
@@ -14,13 +14,13 @@ const thoughtSchema = new Schema(
             default: Date.now
         },
         username: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: String,
             required: true,
             ref: "User"
         },
         reactions: [new mongoose.Schema({
             reactionId: {
-                type: ObjectId,
+                type: mongoose.Schema.Types.ObjectId,
                 default: new mongoose.Types.ObjectId
             },
             reactionBody: {
@@ -29,7 +29,7 @@ const thoughtSchema = new Schema(
                 maxLength: 280
             },
             username: {
-                type: mongoose.Schema.Types.ObjectId,
+                type: String,
                 required: true,
                 ref: "User"
             },
@@ -68,6 +68,6 @@ thoughtSchema.virtual("reactionCount").get(function () {
 });
 
 // Initialize Thought model
-const Thought = model("thought", thoughtSchema);
+const Thought = mongoose.model("thought", thoughtSchema);
 
-module.exports = Thought;
+module.exports = { Thought, thoughtSchema };
