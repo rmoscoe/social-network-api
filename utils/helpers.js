@@ -1,5 +1,6 @@
-function formatDateTime (date) {
-    return date.toLocaleString("en-us", {
+function formatDateAndTime (date) {
+    console.log(date);
+    return new Date(date).toLocaleString("en-us", {
         localeMatcher: "best fit",
         weekday: undefined,
         month: "short",
@@ -11,4 +12,4 @@ function formatDateTime (date) {
     });
 }
 
-module.exports = formatDateTime;
+module.exports = formatDateAndTime;

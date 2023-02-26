@@ -44,7 +44,8 @@ const thoughtSchema = new mongoose.Schema(
     },
     {
         toJSON: {
-            virtuals: true
+            virtuals: true,
+            getters: true
         },
     }
 );
