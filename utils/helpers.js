@@ -1,5 +1,4 @@
 function formatDateAndTime (date) {
-    console.log(date);
     return new Date(date).toLocaleString("en-us", {
         localeMatcher: "best fit",
         weekday: undefined,

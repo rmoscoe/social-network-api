@@ -56,12 +56,6 @@ connection.once("open", async () => {
 
     seededUsers = await User.find();
     
-    // const objUsers = seededUsers.map((user) => {return user.toObject({virtuals: true})});
-    // const objThoughts = seededThoughts.map((thought) => {return thought.toObject({virtuals: true})});
-
-    // console.log(objUsers);
-    // console.log(objThoughts);
-
     console.log(seededUsers.toString());
     console.log(seededThoughts.toString());
     process.exit(0);

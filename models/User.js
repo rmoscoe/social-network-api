@@ -34,22 +34,6 @@ userSchema.virtual("friendCount").get(function () {
     return this.friends.length;
 });
 
-// userSchema.post("init", function () {
-//     this.posts.forEach((post) => {
-//         const date = post.createdAt;
-//         post.createdAt = date.toLocaleString("en-us", {
-//             localeMatcher: "best fit",
-//             weekday: undefined,
-//             month: "short",
-//             day: "2-digit",
-//             year: "numeric",
-//             hour: "2-digit",
-//             minute: "2-digit",
-//             second: "2-digit"
-//         });
-//     });
-// });
-
 // Initialize User model
 const User = model("user", userSchema);
 
