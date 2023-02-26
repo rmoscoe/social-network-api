@@ -12,8 +12,11 @@ const getUsers = (req, res) => {
 // Get a single user
 const getOneUser = (req, res) => {
     User.findOne({ _id: req.params.userId })
-        .populate("friends")
         .populate("thoughts")
+        .populate({
+            path: "friends",
+            model: "user"
+        })
         .then((user) => {
             !user ? res.status(404).json({ message: "No user matching that ID." }) : res.status(200).json(user)
         })
@@ -55,7 +58,7 @@ const deleteUser = (req, res) => {
                 res.status(404).json({ message: "No user matching that ID." });
             } else {
                 Thought.deleteMany({ username: user.username })
-                    .then((thoughtData) => { res.status(200).json(thoughtData) })
+                    .then((thoughtData) => { res.status(204).json(thoughtData) })
                     .catch((err) => {
                         console.error(err);
                         res.status(500).json(err);

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const formatDateAndTime = require("../utils/helpers");
+const { userSchema } = require("./User");
 
 // Schema to create Thought model
 const thoughtSchema = new mongoose.Schema(
