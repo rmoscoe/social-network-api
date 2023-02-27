@@ -41,6 +41,12 @@ const thoughtSchema = new mongoose.Schema(
                 default: Date.now,
                 get: formatDateAndTime
             }
+        },
+        {
+            toJSON: {
+                virtuals: true,
+                getters: true
+            }
         })]
     },
     {

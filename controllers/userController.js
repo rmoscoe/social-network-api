@@ -3,6 +3,7 @@ const { User, Thought } = require("../models");
 // Get all users
 const getUsers = (req, res) => {
     User.find()
+        .select('-__v')
         .then((users) => {
             res.status(200).json(users);
         })
@@ -12,6 +13,7 @@ const getUsers = (req, res) => {
 // Get a single user
 const getOneUser = (req, res) => {
     User.findOne({ _id: req.params.userId })
+        .select('-__v')
         .populate("thoughts")
         .populate({
             path: "friends",
@@ -85,7 +87,7 @@ const addFriend = (req, res) => {
                 )
                     .then((user) => {
                         if (!user) {
-                            res.status(404).json({ message: "Friend not found."});
+                            res.status(404).json({ message: "Friend not found." });
                         } else {
                             res.status(200).json({ message: "Friend successfully added." })
                         }
@@ -120,7 +122,7 @@ const removeFriend = (req, res) => {
                 )
                     .then((user) => {
                         if (!user) {
-                            res.status(404).json({ message: "Friend not found."});
+                            res.status(404).json({ message: "Friend not found." });
                         } else {
                             res.status(200).json({ message: "Friend successfully removed." })
                         }

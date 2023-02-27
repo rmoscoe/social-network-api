@@ -3,6 +3,11 @@ const { User, Thought } = require("../models");
 // Get all thoughts
 const getThoughts = (req, res) => {
     Thought.find()
+        .select('-__v')
+        .populate({
+            path: "reactions",
+            options: { getters: true }
+        })
         .then((thoughts) => {
             res.status(200).json(thoughts);
         })
@@ -15,6 +20,7 @@ const getThoughts = (req, res) => {
 // Get a single thought
 const getOneThought = (req, res) => {
     Thought.findOne({ _id: req.params.thoughtId })
+        .select('-__v')
         .populate("reactions")
         .then((thought) => {
             !thought ? res.status(404).json({ message: "No thought matching that ID." }) : res.status(200).json(thought)
@@ -34,17 +40,17 @@ const createThought = (req, res) => {
                 { $addToSet: { posts: thought._id } },
                 { runValidators: true, new: true }
             )
-            .then((user) => {
-                if (!user) {
-                    res.status(404).json({ message: "No user matching that ID." });
-                } else {
-                    res.status(201).json(thought);
-                }
-            })
-            .catch((err) => {
-                console.error("Error adding thought to User's thoughts: ", err);
-                res.status(500).json(err);
-            });
+                .then((user) => {
+                    if (!user) {
+                        res.status(404).json({ message: "No user matching that ID." });
+                    } else {
+                        res.status(201).json(thought);
+                    }
+                })
+                .catch((err) => {
+                    console.error("Error adding thought to User's thoughts: ", err);
+                    res.status(500).json(err);
+                });
         })
         .catch((err) => {
             console.error("Error creating thought: ", err);
@@ -60,17 +66,17 @@ const updateThought = (req, res) => {
         { $set: req.body },
         { runValidators: true, new: true }
     )
-    .then((thought) => {!thought ? res.status(404).json({ message: "No thought matching that ID." }) : res.status(200).json(thought) })
-    .catch((err) => {
-        console.error(err);
-        return res.status(500).json(err);
-    });
+        .then((thought) => { !thought ? res.status(404).json({ message: "No thought matching that ID." }) : res.status(200).json(thought) })
+        .catch((err) => {
+            console.error(err);
+            return res.status(500).json(err);
+        });
 }
 
 // Delete a thought
 const deleteThought = (req, res) => {
     Thought.findByIdAndDelete(req.params.thoughtId)
-        .then((thought) => {!thought ? res.status(404).json({ message: "No thought matching that ID." }) : res.status(200).json(thought) })
+        .then((thought) => { !thought ? res.status(404).json({ message: "No thought matching that ID." }) : res.status(200).json(thought) })
         .catch((err) => {
             console.error(err);
             return res.status(500).json(err);
@@ -104,12 +110,12 @@ const createReaction = (req, res) => {
 // Delete a reaction and remove it
 const deleteReaction = (req, res) => {
     Thought.findById(req.params.thoughtId)
-        .then(async (thought) => {
+        .then((thought) => {
             if (!thought) {
                 res.status(404).json({ message: "No thought matching that ID." });
             } else {
-                thought.reactions.id(req.params.reactionId).remove();
-                await thought.save((err) => {
+                thought.reactions.pull({ _id: req.params.reactionId });
+                thought.save((err) => {
                     if (err) {
                         console.error("Error saving thought: ", err);
                         return res.status(500).json(err);

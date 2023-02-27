@@ -100,7 +100,7 @@ function makeThought (users) {
     const reactions = [];
     for (let i = 0; i < Math.floor(Math.random() * 5); i++) {
         const reaction = {};
-        reaction.reacionBody = getRando(reactionBodies);
+        reaction.reactionBody = getRando(reactionBodies);
         reaction.username = users[Math.floor(Math.random() * users.length)].username;
         reactions.push(reaction);
     }
